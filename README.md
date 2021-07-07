@@ -9,5 +9,5 @@ You can find our experiments with synthetic data in the following notebooks:
 4. [A single gaussian blob using the leaves of a kd-tree as paritioning](Experiment_04__KD_Tree_Uniform.ipynb)
 
 Additionally we tried our method on MNIST using a simple Autoencoder for feature reduction.
-You can find the notebooks (here)[MNIST-LIS.ipynb] and (here)[MNIST-LIS-KD_Tree.ipynb]
-The figures illustrating our results are generated (here)[Analysis.ipynb
+You can find the notebooks [here](MNIST-LIS.ipynb) and [here](MNIST-LIS-KD_Tree.ipynb)
+The figures illustrating our results are generated [here](Analysis.ipynb)
