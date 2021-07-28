@@ -1,4 +1,4 @@
-from k_means_constrained import KMeansConstrained
+#from k_means_constrained import KMeansConstrained
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import make_blobs
@@ -19,6 +19,7 @@ import pandas as pd
 from tqdm.notebook import tqdm
 from sklearn.neighbors import KDTree
 
+# Just use the closest centroid to identify the partition
 class BaselineClassifier:
     def __init__(self, centers):
         self.centers = centers
@@ -101,29 +102,33 @@ def run(n_samples, n_features, n_clusters, cluster_std, k, n_test, random_seed, 
         valid_acc = accuracy_score(y_valid, y_pred_valid)
         experiment[f'{name}_valid'] = valid_acc
         experiment[f'{name}_mean_error'] = np.mean(errors)
-        test_acc = nn_accuracy(errors)
-        experiment[f'{name}_test'] = test_acc
-        #print(f'{name}: train: {train_acc}, valid: {valid_acc}, test: {test_acc}, error: {np.mean(errors)}')
+        #test_acc = nn_accuracy(errors)
+        #experiment[f'{name}_test'] = test_acc
+        #print(random_seed)
+        #print(f'{name}: train: {train_acc}, valid: {valid_acc}, error: {np.mean(errors)}')
         #pd.DataFrame(errors).plot()
     
     return experiment, X_clust
 
 
-
 def evaluate(X_index, X_clust, X_query, clf):
     n_features = X_index.shape[1]
 
-    nbrs = NearestNeighbors(n_neighbors=2, algorithm='brute').fit(X_index)
+    nbrs = NearestNeighbors(n_neighbors=1, algorithm='brute').fit(X_index)
     n_1 = nbrs.kneighbors(X_query, return_distance=False)
 
     errors = []
     for i in range(0, X_query.shape[0]):
-        print(X_query[i])
-        print(X_index[n_1[i]])
         X_found = X_clust[X_clust[:, n_features] == np.asarray(clf.predict(X_query[i].reshape(1, -1)), dtype=np.integer)][:, :n_features]
         nbrs_2 = NearestNeighbors(n_neighbors=1, algorithm='brute').fit(X_found)
         n_2 = nbrs_2.kneighbors([X_query[i]])[1][0][0]
-        error = np.sum(np.abs(X_index[n_1[i]] - X_found[n_2]))
+        real_dist = np.linalg.norm(X_index[n_1[i]] - X_query[i])
+        #print(X_index[n_1[i]][0])
+        approx_dist = np.linalg.norm(X_found[n_2] - X_query[i])
+        #print(X_found[n_2])
+        error = np.abs(1 - (approx_dist / real_dist))
+        #print(error)
+        #print(np.sum(np.abs(X_index[n_1[i]] - X_found[n_2])))
         errors.append(error)
     return errors
 
